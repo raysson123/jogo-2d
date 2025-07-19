@@ -9,7 +9,7 @@ import java.net.URL;
 
 public class GamePanel extends JPanel implements Runnable {
     // Configurações da tela
-    final int originalTileSize = 16; // Tamanho original de um 'tile' (bloco) em pixels (ex: um personagem ou item pode ter 16x16 pixels)
+    final int originalTileSize = 16; // Tamanho original de um 'tile' (bloco) em pixels
     final int scale = 3; // Fator de escala para aumentar o tamanho dos 'tiles' na tela
     public final int tileSize = originalTileSize * scale; // Tamanho final de um 'tile' na tela (16 * 3 = 48 pixels)
     final int maxScreenCol = 16; // Número máximo de colunas de 'tiles' na tela
@@ -24,6 +24,7 @@ public class GamePanel extends JPanel implements Runnable {
     int playerX = 100;
     int playerY = 100;
     int playerSpeed = 4; // Velocidade de movimento do jogador
+
     // Sprite do jogador
     BufferedImage playerSprite;
     int spriteNum = 1; // Para simular quadros de animação (ex: 1 ou 2)
@@ -45,25 +46,29 @@ public class GamePanel extends JPanel implements Runnable {
     public void getPlayerImage() {
         try {
             // URL de uma imagem de placeholder. Em um jogo real, você carregaria seus próprios arquivos de imagem.
-            // Exemplo de URL de placeholder para um quadrado branco 48x48:
             URL imageUrl = new URL("https://placehold.co/48x48/ffffff/000000?text=Player");
             playerSprite = ImageIO.read(imageUrl);
         } catch (IOException e) {
-            e.printStackTrace();
-            // Em caso de erro ao carregar a imagem, você pode definir um sprite padrão ou logar o erro.
             System.err.println("Erro ao carregar a imagem do jogador: " + e.getMessage());
+            // Em caso de erro ao carregar a imagem, cria um sprite de fallback magenta
+            // para que o jogo ainda mostre algo no lugar do jogador.
+            playerSprite = new BufferedImage(tileSize, tileSize, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = playerSprite.createGraphics();
+            g2.setColor(Color.MAGENTA); // Cor de erro facilmente visível
+            g2.fillRect(0, 0, tileSize, tileSize);
+            g2.dispose(); // Libera os recursos gráficos temporários
         }
     }
 
     public void startGameThread() {
-        gameThread = new Thread(this); // Cria uma nova thread, passando esta instância de MAIN.GamePanel (que implementa Runnable)
+        gameThread = new Thread(this); // Cria uma nova thread, passando esta instância de GamePanel (que implementa Runnable)
         gameThread.start(); // Inicia a execução da thread, que por sua vez chama o método run()
     }
 
     @Override
     public void run() {
         // Calcula o intervalo de tempo para cada quadro para atingir o FPS desejado
-        double drawInterval = 1000000000.0 / FPS; // 1 bilhão de nanossegundos (1 segundo) dividido pelo FPS (ex: 10^9 / 60 = 16.666.666,67 nanossegundos)
+        double drawInterval = 1000000000.0 / FPS; // 1 bilhão de nanossegundos (1 segundo) dividido pelo FPS
         double nextDrawTime = System.nanoTime() + drawInterval; // Calcula o tempo em que o próximo quadro deve ser desenhado
 
         // O loop principal do jogo
@@ -87,7 +92,11 @@ public class GamePanel extends JPanel implements Runnable {
 
                 nextDrawTime += drawInterval; // Atualiza o tempo para o próximo desenho
             } catch (InterruptedException e) {
-                e.printStackTrace(); // Imprime o rastreamento da pilha se a thread for interrompida
+                // Se a thread for interrompida, restaura o estado de interrupção
+                // e pode-se decidir sair do loop ou logar o erro.
+                Thread.currentThread().interrupt();
+                System.err.println("A thread do jogo foi interrompida: " + e.getMessage());
+                // Opcional: break; para sair do loop se a interrupção for crítica
             }
         }
     }
@@ -111,11 +120,7 @@ public class GamePanel extends JPanel implements Runnable {
             // Lógica simples para simular animação (troca de sprite)
             spriteCounter++;
             if (spriteCounter > 12) { // Troca de sprite a cada 12 frames (ajuste para a velocidade da animação)
-                if (spriteNum == 1) {
-                    spriteNum = 2;
-                } else if (spriteNum == 2) {
-                    spriteNum = 1;
-                }
+                spriteNum = (spriteNum == 1) ? 2 : 1; // Alterna entre 1 e 2 de forma mais concisa
                 spriteCounter = 0;
             }
         }
@@ -127,16 +132,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         Graphics2D g2 = (Graphics2D) g; // Converte o objeto Graphics para Graphics2D para mais funcionalidades de desenho
 
-        // Desenha o sprite do jogador na sua posição atual
-        if (playerSprite != null) {
-            g2.drawImage(playerSprite, playerX, playerY, tileSize, tileSize, null);
-        } else {
-            // Se o sprite não carregou, desenha um retângulo como fallback
-            g2.setColor(Color.red); // Cor de fallback
-            g2.fillRect(playerX, playerY, tileSize, tileSize);
-        }
+        // Desenha o sprite do jogador na sua posição atual.
+        // O playerSprite nunca será nulo devido ao tratamento de erro em getPlayerImage().
+        g2.drawImage(playerSprite, playerX, playerY, tileSize, tileSize, null);
 
         g2.dispose(); // Libera os recursos gráficos usados por este contexto Graphics2D
     }
 }
-
