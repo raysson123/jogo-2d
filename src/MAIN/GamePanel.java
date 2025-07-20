@@ -1,6 +1,9 @@
 package MAIN;
 
 import Entity.Player;
+import title.TileManager;
+
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -15,24 +18,31 @@ public class GamePanel extends JPanel implements Runnable {
     // Tamanho final de um 'tile' na tela após a aplicação da escala.
     public final int tileSize = originalTileSize * scale; // Resulta em 48x48 pixels por tile.
     // Número máximo de colunas de 'tiles' que cabem na tela do jogo.
-    final int maxScreenCol = 16;
+    public final int maxScreenCol = 16;
     // Número máximo de linhas de 'tiles' que cabem na tela do jogo.
-    final int maxScreenRow = 12;
+    public   final int maxScreenRow = 12;
     // Largura total da tela do jogo em pixels (número de colunas * tamanho do tile).
-    final int screenWidth = tileSize * maxScreenCol; // Ex: 48 * 16 = 768 pixels.
+    public final int screenWidth = tileSize * maxScreenCol; // Ex: 48 * 16 = 768 pixels.
     // Altura total da tela do jogo em pixels (número de linhas * tamanho do tile).
-    final int screenHeight = tileSize * maxScreenRow; // Ex: 48 * 12 = 576 pixels.
-
+    public final int screenHeight = tileSize * maxScreenRow; // Ex: 48 * 12 = 576 pixels.
+    //WORLD SETTINGS
+    public  final  int maxWorldCol = 50;
+    public  final int maxWorldRow = 50;
+    public  final int worlWidth = maxWorldCol * tileSize;
+    public  final int worldHeight = maxWorldRow * tileSize;
     // --- Thread do Jogo ---
     // A thread que executará o ciclo principal do jogo (o 'game loop').
     // Uma thread separada garante que o jogo não congele a interface do usuário.
+    TileManager tileM = new TileManager(this); // Inicializa o gerenciador de tiles com o GamePanel.
     Thread gameThread;
     // Instância do nosso manipulador de teclado, que detecta as teclas pressionadas e liberadas.
     KeyHandler keyH = new KeyHandler();
-
+    public CollisionChecker cChecker = new CollisionChecker(this);
     // --- Entidades do Jogo ---
     // Instância do jogador. Agora o GamePanel gerencia um objeto Player.
-    Player player = new Player(this, keyH); // Passa o próprio GamePanel e o KeyHandler para o Player.
+    public Player player = new Player(this, keyH); // Passa o próprio GamePanel e o KeyHandler para o Player.
+
+
 
     // --- FPS (Frames por Segundo) ---
     int FPS = 60; // Define a taxa de quadros desejada para o jogo.
@@ -130,6 +140,7 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
 
         // Delega o desenho do jogador para a classe Player.
+        tileM.draw(g2);
         player.draw(g2);
 
         // Libera os recursos gráficos usados por este contexto Graphics2D.

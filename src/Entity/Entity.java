@@ -11,7 +11,7 @@ public class Entity {
     GamePanel gp; // Referência ao GamePanel para acessar suas propriedades (como tileSize).
 
     // Posição e Velocidade da Entidade
-    public int x, y; // Coordenadas X e Y da entidade.
+    public int worldX, worldY; // Coordenadas X e Y da entidade.
     public int speed; // Velocidade de movimento da entidade.
 
     // Sprite da Entidade
@@ -21,6 +21,10 @@ public class Entity {
 
     public int spriteCounter = 0;
     public int spriteNum = 1;
+
+    public Rectangle solidArea;
+
+    public boolean collisiOn = false;
 
 
 

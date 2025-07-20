@@ -11,13 +11,24 @@ import java.io.InputStream;
 
 public class Player extends Entity {
 
-    private final GamePanel gp;       // Referência ao GamePanel.
-    private final KeyHandler keyH;    // Referência ao KeyHandler.
+    GamePanel gp;       // Referência ao GamePanel.
+    KeyHandler keyH;    // Referência ao KeyHandler.
 
+    public final  int screenX;
+    public final int screenY;
     // Construtor da classe Player.
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
+
+        screenX = gp.screenWidth/2 - (gp.tileSize/2);
+        screenY = gp.screenHeight/2 - (gp.tileSize/2);
+
+        solidArea = new Rectangle();
+        solidArea.x = 8;
+        solidArea.y = 16;
+        solidArea.width = 32;
+        solidArea.height = 32;
 
         setDefaultValues();   // Define posição, velocidade e direção inicial.
         loadPlayerImages();   // Carrega as imagens do personagem.
@@ -25,8 +36,8 @@ public class Player extends Entity {
 
     // Define valores iniciais para o jogador.
     public void setDefaultValues() {
-        x = 100;
-        y = 100;
+        worldX = gp.tileSize*23;
+        worldY = gp.tileSize*21;
         speed = 4;
         directin = "down"; // Corrigir o nome da variável para "direction" futuramente.
     }
@@ -65,16 +76,28 @@ public class Player extends Entity {
 
             if (keyH.upPressed) {
                 directin = "up";
-                y -= speed;
+
             } else if (keyH.downPressed) {
                 directin = "down";
-                y += speed;
+
             } else if (keyH.leftPressed) {
                 directin = "left";
-                x -= speed;
+
             } else if (keyH.rightPressed) {
                 directin = "right";
-                x += speed;
+
+            }
+            //checj title collision
+            collisiOn = false;
+            gp.cChecker.checkTile(this);
+            //if collision is false, player can move
+            if (collisiOn == false){
+                switch (directin){
+                    case "up": worldY -= speed; break;
+                    case "down": worldY += speed; break;
+                    case "right": worldX += speed; break;
+                    case "left": worldX -= speed; break;
+                }
             }
 
             // Controle de animação
@@ -105,6 +128,6 @@ public class Player extends Entity {
                 break;
         }
 
-        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        g2.drawImage(image, screenX, screenY , gp.tileSize, gp.tileSize, null);
     }
 }

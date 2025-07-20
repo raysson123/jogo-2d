@@ -2,7 +2,7 @@ package title;
 
 import java.awt.image.BufferedImage;
 
-public class Title {
+public class Tile {
     public BufferedImage image;
-    public boolean conllision = false;
+    public boolean collision = false;
 }
