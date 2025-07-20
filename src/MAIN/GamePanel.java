@@ -29,8 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
     //WORLD SETTINGS
     public  final  int maxWorldCol = 50;
     public  final int maxWorldRow = 50;
-    public  final int worlWidth = maxWorldCol * tileSize;
-    public  final int worldHeight = maxWorldRow * tileSize;
+
     // --- Thread do Jogo ---
     // A thread que executará o ciclo principal do jogo (o 'game loop').
     // Uma thread separada garante que o jogo não congele a interface do usuário.
@@ -38,9 +37,15 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     // Instância do nosso manipulador de teclado, que detecta as teclas pressionadas e liberadas.
     KeyHandler keyH = new KeyHandler();
+    Sound music = new Sound(); // Inicializa o objeto Sound.
+    Sound se = new Sound(); // Inicializa o objeto Sound.
+
     public CollisionChecker cChecker = new CollisionChecker(this);
     // --- Entidades do Jogo ---
     public AssetSetter aSetter = new AssetSetter(this); // Inicializa o AssetSetter com o GamePanel.
+
+
+
     // Instância do jogador. Agora o GamePanel gerencia um objeto Player.
     public Player player = new Player(this, keyH); // Passa o próprio GamePanel e o KeyHandler para o Player.
     public SuperObject obj[] = new SuperObject[10];
@@ -68,6 +73,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public void setupGame(){
         aSetter.setObject();
+        playMusic(0);
     }
 
     // Método para iniciar a thread do jogo.
@@ -160,5 +166,17 @@ public class GamePanel extends JPanel implements Runnable {
         // Libera os recursos gráficos usados por este contexto Graphics2D.
         // É uma boa prática para otimização de memória.
         g2.dispose();
+    }
+    public void playMusic(int i){
+        music.setFile(i);
+        music.play();
+        music.loop();
+    }
+    public void stopMusic() {
+        music.stop();
+    }
+    public void playSE(int i){
+        se.setFile(i);
+        se.play();
     }
 }
