@@ -16,6 +16,7 @@ public class Player extends Entity {
 
     public final  int screenX;
     public final int screenY;
+    int hasKey = 0;
     // Construtor da classe Player.
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -27,6 +28,8 @@ public class Player extends Entity {
         solidArea = new Rectangle();
         solidArea.x = 8;
         solidArea.y = 16;
+        solidAreaDefaultX = solidArea.x;
+        solidAreaDefaultY = solidArea.y;
         solidArea.width = 32;
         solidArea.height = 32;
 
@@ -90,6 +93,12 @@ public class Player extends Entity {
             //checj title collision
             collisiOn = false;
             gp.cChecker.checkTile(this);
+
+            //checj object collision
+            int objIndex = gp.cChecker.checkObject(this, true);
+            pickUpObject(objIndex);
+
+
             //if collision is false, player can move
             if (collisiOn == false){
                 switch (directin){
@@ -108,6 +117,27 @@ public class Player extends Entity {
             }
         }
     }
+    public void pickUpObject(int i){
+        if ( i != 999){
+            String objectName = gp.obj[i].name;
+            switch (objectName){
+                case "Key":
+                    hasKey++;
+                    gp.obj[i] = null;
+                    System.out.println("key:"+hasKey);
+                    break;
+                case "Door":
+                    if (hasKey > 0){
+                        gp.obj[i] = null;
+                        hasKey--;
+                    }
+                    System.out.println("key:"+hasKey);
+
+                    break;
+            }
+        }
+    }
+
 
     // Desenha o jogador na tela com base na direção e no sprite atual.
     public void draw(Graphics2D g2) {

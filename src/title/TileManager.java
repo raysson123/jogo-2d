@@ -131,8 +131,13 @@ public class TileManager {
 
             // SOMENTE desenha os tiles que estão visíveis na tela
             // Isso é uma otimização crucial para performance.
-
-            g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            if( worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
+                    worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
+                    worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
+                    worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
+                // Desenha o tile na tela
+                g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            }
             worldCol++;
 
             if (worldCol == gp.maxWorldCol) {

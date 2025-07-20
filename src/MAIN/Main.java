@@ -19,6 +19,7 @@ public class Main {
         window.setLocationRelativeTo(null); // Centraliza a janela na tela do usuário
         window.setVisible(true); // Torna a janela visível para o usuário
 
+        gamePanel.setupGame(); // Configura o jogo antes de iniciá-lo
         gamePanel.startGameThread(); // Inicia a thread principal do jogo, onde a lógica e o desenho ocorrerão
     }
 }

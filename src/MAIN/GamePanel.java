@@ -1,6 +1,7 @@
 package MAIN;
 
 import Entity.Player;
+import object.SuperObject;
 import title.TileManager;
 
 
@@ -18,11 +19,11 @@ public class GamePanel extends JPanel implements Runnable {
     // Tamanho final de um 'tile' na tela após a aplicação da escala.
     public final int tileSize = originalTileSize * scale; // Resulta em 48x48 pixels por tile.
     // Número máximo de colunas de 'tiles' que cabem na tela do jogo.
-    public final int maxScreenCol = 16;
+    public final int maxScreenCol = 20;
     // Número máximo de linhas de 'tiles' que cabem na tela do jogo.
     public   final int maxScreenRow = 12;
     // Largura total da tela do jogo em pixels (número de colunas * tamanho do tile).
-    public final int screenWidth = tileSize * maxScreenCol; // Ex: 48 * 16 = 768 pixels.
+    public final int screenWidth = tileSize * maxScreenCol; // Ex: 48 * 20 = 768 pixels.
     // Altura total da tela do jogo em pixels (número de linhas * tamanho do tile).
     public final int screenHeight = tileSize * maxScreenRow; // Ex: 48 * 12 = 576 pixels.
     //WORLD SETTINGS
@@ -39,8 +40,10 @@ public class GamePanel extends JPanel implements Runnable {
     KeyHandler keyH = new KeyHandler();
     public CollisionChecker cChecker = new CollisionChecker(this);
     // --- Entidades do Jogo ---
+    public AssetSetter aSetter = new AssetSetter(this); // Inicializa o AssetSetter com o GamePanel.
     // Instância do jogador. Agora o GamePanel gerencia um objeto Player.
     public Player player = new Player(this, keyH); // Passa o próprio GamePanel e o KeyHandler para o Player.
+    public SuperObject obj[] = new SuperObject[10];
 
 
 
@@ -62,6 +65,9 @@ public class GamePanel extends JPanel implements Runnable {
         // Permite que este painel receba o foco para capturar as entradas do teclado.
         // É essencial para que o KeyListener funcione.
         this.setFocusable(true);
+    }
+    public void setupGame(){
+        aSetter.setObject();
     }
 
     // Método para iniciar a thread do jogo.
@@ -140,7 +146,15 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
 
         // Delega o desenho do jogador para a classe Player.
+        //tile
         tileM.draw(g2);
+        //obj
+        for(int i = 0; i < obj.length; i++){
+            if(obj[i] != null){
+                obj[i].draw(g2, this);
+            }
+        }
+        //player
         player.draw(g2);
 
         // Libera os recursos gráficos usados por este contexto Graphics2D.

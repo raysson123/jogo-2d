@@ -23,7 +23,7 @@ public class Entity {
     public int spriteNum = 1;
 
     public Rectangle solidArea;
-
+    public int solidAreaDefaultX, solidAreaDefaultY; // Valor padrão para a área sólida da entidade.
     public boolean collisiOn = false;
 
 
