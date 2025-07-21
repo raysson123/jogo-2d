@@ -39,7 +39,7 @@ public class GamePanel extends JPanel implements Runnable {
     KeyHandler keyH = new KeyHandler();
     Sound music = new Sound(); // Inicializa o objeto Sound.
     Sound se = new Sound(); // Inicializa o objeto Sound.
-
+    public UI ui = new UI(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     // --- Entidades do Jogo ---
     public AssetSetter aSetter = new AssetSetter(this); // Inicializa o AssetSetter com o GamePanel.
@@ -162,6 +162,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
         //player
         player.draw(g2);
+
+        //UI
+        ui.draw(g2);
 
         // Libera os recursos gráficos usados por este contexto Graphics2D.
         // É uma boa prática para otimização de memória.

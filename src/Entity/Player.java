@@ -16,7 +16,7 @@ public class Player extends Entity {
 
     public final  int screenX;
     public final int screenY;
-    int hasKey = 0;
+    public int hasKey = 0;
     // Construtor da classe Player.
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -125,22 +125,25 @@ public class Player extends Entity {
                     gp.playSE(1);
                     hasKey++;
                     gp.obj[i] = null;
-                    System.out.println("key:"+hasKey);
+                    gp.ui.showMessage("Você tem uma chave!");
                     break;
                 case "Door":
                     if (hasKey > 0){
                         gp.playSE(3);
                         gp.obj[i] = null;
                         hasKey--;
+                        gp.ui.showMessage("Você abre a porta!");
                     }
-                    System.out.println("key:"+hasKey);
+                    else {
+                        gp.ui.showMessage("Você precisa de uma chave!");
+                    }
 
                     break;
                     case "Boots":
                         gp.playSE(2);
                         speed += 1;
                         gp.obj[i] = null;
-                        System.out.println("speed:"+speed);
+                        gp.ui.showMessage("Você recebe os botas!");
                         break;
             }
         }
