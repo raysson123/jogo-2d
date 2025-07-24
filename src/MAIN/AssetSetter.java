@@ -1,5 +1,6 @@
 package MAIN;
 
+import Entity.Inimigo;
 import object.OBJ_Boots;
 import object.OBJ_Chest;
 import object.OBJ_Door;
@@ -10,6 +11,9 @@ public class AssetSetter {
     public AssetSetter(GamePanel gp){
         this.gp = gp;
     }
+    
+    
+    
     public void setObject(){
         gp.obj[0] = new OBJ_Key();
         gp.obj[0].worldX = gp.tileSize * 23;
@@ -18,6 +22,8 @@ public class AssetSetter {
         gp.obj[1] = new OBJ_Key();
         gp.obj[1].worldX = gp.tileSize * 23;
         gp.obj[1].worldY = gp.tileSize * 40;
+        
+        
 
         gp.obj[2] = new OBJ_Door();
         gp.obj[2].worldX = gp.tileSize * 38;
@@ -44,5 +50,17 @@ public class AssetSetter {
         gp.obj[7].worldY = gp.tileSize * 42;
 
 
+    }
+    
+    public void setInimigos() {
+        // Inimigo perto da chave 1 (tile 23,7) -> colocamos 2 tiles à direita (X + 2)
+        gp.inimigos[0] = new Inimigo(gp);
+        gp.inimigos[0].worldX = gp.tileSize * (23 + 2); // 25
+        gp.inimigos[0].worldY = gp.tileSize * 7;
+
+        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
+        gp.inimigos[1] = new Inimigo(gp);
+        gp.inimigos[1].worldX = gp.tileSize * 23;
+        gp.inimigos[1].worldY = gp.tileSize * (40 + 2); // 42
     }
 }

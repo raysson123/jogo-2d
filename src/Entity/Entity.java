@@ -7,6 +7,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Entity {
+	
+	 public Entity(GamePanel gp) {
+	        this.gp = gp;
+	    }
 
     GamePanel gp; // Referência ao GamePanel para acessar suas propriedades (como tileSize).
 
@@ -30,6 +34,7 @@ public class Entity {
 
     // Imagem (sprite) atual da entidade.
 
+   
 
 
 
