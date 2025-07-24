@@ -11,21 +11,21 @@ import java.io.InputStream;
 public class Flecha extends Entity {
 
     public boolean ativa = true;
+    private  boolean  pf= true; // primero
+    public int tempoAceleracao = 0;
+    public final int tempoMaximoAntesDeAcelerar = 40;   // tepode  de retado de rederisaçãom
 
     public Flecha(GamePanel gp, int startX, int startY, String direction) {
         super(gp);
         this.worldX = startX;
         this.worldY = startY;
-        this.directin = direction; // ✅ corrigido
-        this.speed = 6;
+        this.directin = direction; // ✅ Corrigido
+        this.speed = 1;
 
-        solidArea = new Rectangle();
-        solidArea.x = 8;
-        solidArea.y = 8;
+        // Ajuste de colisão da flecha
+        solidArea = new Rectangle(8, 8, 32, 32);
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
-        solidArea.width = 32;
-        solidArea.height = 32;
 
         carregarSprites();
     }
@@ -37,6 +37,7 @@ public class Flecha extends Entity {
             left1 = carregarImagem("/flechas/flechaEsq.png");
             right1 = carregarImagem("/flechas/flechaDir.png");
 
+            // As imagens secundárias podem ser iguais às primárias
             up2 = up1;
             down2 = down1;
             left2 = left1;
@@ -56,8 +57,12 @@ public class Flecha extends Entity {
 
     public void update() {
         if (!ativa) return;
-
-        collisiOn = false; // ✅ corrigido
+        if (tempoAceleracao < tempoMaximoAntesDeAcelerar) {
+            tempoAceleracao++;
+        } else {
+            speed = 4; // Acelera após X frames
+        }
+        collisiOn = false; // ✅ Corrigido (antes: collisiOn)
         gp.cChecker.checkTile(this);
 
         if (!collisiOn) {
@@ -71,6 +76,7 @@ public class Flecha extends Entity {
             ativa = false;
         }
 
+        // Animação da flecha, se houver (não essencial)
         spriteCounter++;
         if (spriteCounter > 12) {
             spriteNum = (spriteNum == 1) ? 2 : 1;
@@ -89,12 +95,11 @@ public class Flecha extends Entity {
             default -> null;
         };
 
-        if (image == null) return; // ✅ evita erro se imagem não carregou
+        if (image == null) return; // evita erro se imagem não carregou
 
-        // ✅ converte coordenadas do mundo para tela
+        // Calcula posição relativa ao jogador
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
-
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
 }

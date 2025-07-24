@@ -37,7 +37,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Player player = new Player(this, keyH);
     public SuperObject[] obj = new SuperObject[10];
     public Inimigo[] inimigos = new Inimigo[10];
-    public Flecha[] flechas = new Flecha[20]; // ✅ Array de flechas
+    public Flecha[] flechas = new Flecha[10]; // ✅ Array de flechas
 
     // --- FPS ---
     int FPS = 60;

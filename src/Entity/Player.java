@@ -57,9 +57,9 @@ public class Player extends Entity {
             down1 = loadImage("/player/arqueiroBai-1.png");
             down2 = loadImage("/player/arqueiroBai-2.png");
             left1 = loadImage("/player/arqueiroEsq-1.png");
-            left2 = loadImage("/player/arqueiroEsq-3.png");
+            left2 = loadImage("/player/arqueiroEsq-2.png");
             right1 = loadImage("/player/arqueiroDir-1.png");
-            right2 = loadImage("/player/arqueiroDir-3.png");
+            right2 = loadImage("/player/arqueiroDir-2.png");
         } catch (IOException | IllegalArgumentException e) {
             System.err.println("Erro ao carregar as imagens do jogador: " + e.getMessage());
             e.printStackTrace();
@@ -116,10 +116,12 @@ public class Player extends Entity {
         int flechaX = worldX;
         int flechaY = worldY;
 
+
         for (int i = 0; i < gp.flechas.length; i++) {
             if (gp.flechas[i] == null || !gp.flechas[i].ativa) {
                 gp.flechas[i] = new Flecha(gp, flechaX, flechaY, directin);
                 gp.playSE(4);
+
                 break;
             }
         }
