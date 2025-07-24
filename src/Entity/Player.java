@@ -21,6 +21,9 @@ public class Player extends Entity {
     // Contador de chaves coletadas
     public int hasKey = 0;
 
+    // ✅ Novo campo de experiência
+    public int xp = 0;
+
     // Construtor do jogador
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
@@ -46,8 +49,9 @@ public class Player extends Entity {
         worldX = gp.tileSize * 23;
         worldY = gp.tileSize * 21;
         speed = 4;
-        directin = "down"; // Corrigido
+        directin = "down";
         hasKey = 0;
+        xp = 0; // ✅ zera XP ao iniciar
     }
 
     private void loadPlayerImages() {
@@ -111,17 +115,14 @@ public class Player extends Entity {
         }
     }
 
-    // ✅ Flecha nasce exatamente na mesma posição do jogador
     public void dispararFlecha() {
         int flechaX = worldX;
         int flechaY = worldY;
-
 
         for (int i = 0; i < gp.flechas.length; i++) {
             if (gp.flechas[i] == null || !gp.flechas[i].ativa) {
                 gp.flechas[i] = new Flecha(gp, flechaX, flechaY, directin);
                 gp.playSE(4);
-
                 break;
             }
         }

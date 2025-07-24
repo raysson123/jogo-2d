@@ -15,7 +15,7 @@ public class Inimigo extends Entity {
     int movimentoPatrulhaCounter = 0;
     String direcaoPatrulha = "right";
 
-    private int vida = 3;
+    int vida = 3;
     private boolean morrendo = false;
     private int contadorDesaparecimento = 0;
     private boolean visivel = true;
@@ -149,8 +149,8 @@ public class Inimigo extends Entity {
         };
 
         g2.drawImage(imagem,
-            worldX - gp.player.worldX + gp.player.screenX,
-            worldY - gp.player.worldY + gp.player.screenY,
-            gp.tileSize, gp.tileSize, null);
+                worldX - gp.player.worldX + gp.player.screenX,
+                worldY - gp.player.worldY + gp.player.screenY,
+                gp.tileSize, gp.tileSize, null);
     }
 }

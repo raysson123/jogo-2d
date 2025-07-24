@@ -75,12 +75,12 @@ public class CollisionChecker {
                     case "up":
                         entity.solidArea.y -= entity.speed;
                         if (entity.solidArea.intersects(gp.obj[i].solidArea)){
-                           if( gp.obj[i].collision == true){
-                               entity.collisiOn = true;
-                           }
-                           if(player==true){
-                               index = i;
-                           }
+                            if( gp.obj[i].collision == true){
+                                entity.collisiOn = true;
+                            }
+                            if(player==true){
+                                index = i;
+                            }
                         }
                         break;
                     case "down":
@@ -110,7 +110,7 @@ public class CollisionChecker {
                         if (entity.solidArea.intersects(gp.obj[i].solidArea)){
                             if( gp.obj[i].collision == true){
                                 entity.collisiOn = true;
-                           } if(player==true){
+                            } if(player==true){
                                 index = i;
                             }
                         }
@@ -129,4 +129,36 @@ public class CollisionChecker {
         }
         return index;
     }
+
+    public int checkInimigo(Entity entity) {
+        for (int i = 0; i < gp.inimigos.length; i++) {
+            Entity inimigo = gp.inimigos[i];
+            if (inimigo != null) {
+                // Ajusta áreas sólidas
+                entity.solidArea.x = entity.worldX + entity.solidArea.x;
+                entity.solidArea.y = entity.worldY + entity.solidArea.y;
+                inimigo.solidArea.x = inimigo.worldX + inimigo.solidArea.x;
+                inimigo.solidArea.y = inimigo.worldY + inimigo.solidArea.y;
+
+                // Verifica colisão
+                if (entity.solidArea.intersects(inimigo.solidArea)) {
+                    // Restaura áreas
+                    entity.solidArea.x = entity.solidAreaDefaultX;
+                    entity.solidArea.y = entity.solidAreaDefaultY;
+                    inimigo.solidArea.x = inimigo.solidAreaDefaultX;
+                    inimigo.solidArea.y = inimigo.solidAreaDefaultY;
+                    return i; // índice do inimigo atingido
+                }
+
+                // Restaura áreas
+                entity.solidArea.x = entity.solidAreaDefaultX;
+                entity.solidArea.y = entity.solidAreaDefaultY;
+                inimigo.solidArea.x = inimigo.solidAreaDefaultX;
+                inimigo.solidArea.y = inimigo.solidAreaDefaultY;
+            }
+        }
+        return -1; // nenhum inimigo atingido
+    }
+
+
 }

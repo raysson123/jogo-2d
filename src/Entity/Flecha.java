@@ -11,7 +11,7 @@ import java.io.InputStream;
 public class Flecha extends Entity {
 
     public boolean ativa = true;
-    private  boolean  pf= true; // primero
+
     public int tempoAceleracao = 0;
     public final int tempoMaximoAntesDeAcelerar = 40;   // tepode  de retado de rederisaçãom
 
@@ -19,16 +19,20 @@ public class Flecha extends Entity {
         super(gp);
         this.worldX = startX;
         this.worldY = startY;
-        this.directin = direction; // ✅ Corrigido
+        this.directin = direction;
         this.speed = 1;
 
-        // Ajuste de colisão da flecha
-        solidArea = new Rectangle(8, 8, 32, 32);
+        solidArea = new Rectangle();
+        solidArea.x = 8;
+        solidArea.y = 8;
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
+        solidArea.width = 32;
+        solidArea.height = 32;
 
         carregarSprites();
     }
+
 
     private void carregarSprites() {
         try {
@@ -37,7 +41,6 @@ public class Flecha extends Entity {
             left1 = carregarImagem("/flechas/flechaEsq.png");
             right1 = carregarImagem("/flechas/flechaDir.png");
 
-            // As imagens secundárias podem ser iguais às primárias
             up2 = up1;
             down2 = down1;
             left2 = left1;
@@ -65,6 +68,20 @@ public class Flecha extends Entity {
         collisiOn = false; // ✅ Corrigido (antes: collisiOn)
         gp.cChecker.checkTile(this);
 
+        collisiOn = false;
+        gp.cChecker.checkTile(this);
+
+        // ✅ Verifica colisão com inimigos
+        int index = gp.cChecker.checkInimigo(this);
+        if (index != -1) {
+            gp.inimigos[index].sofrerDano(1); // tira 1 de vida
+            if (gp.inimigos[index].vida <= 0) {
+                gp.player.xp += 3; // dá 3 de XP ao jogador
+            }
+            ativa = false; // flecha desaparece após atingir
+            return;
+        }
+
         if (!collisiOn) {
             switch (directin) {
                 case "up" -> worldY -= speed;
@@ -76,14 +93,12 @@ public class Flecha extends Entity {
             ativa = false;
         }
 
-        // Animação da flecha, se houver (não essencial)
         spriteCounter++;
         if (spriteCounter > 12) {
             spriteNum = (spriteNum == 1) ? 2 : 1;
             spriteCounter = 0;
         }
     }
-
     public void draw(Graphics2D g2) {
         if (!ativa) return;
 
