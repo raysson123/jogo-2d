@@ -25,7 +25,7 @@ public class AssetSetter {
         
         
 
-        gp.obj[2] = new OBJ_Door();
+        gp.obj[2] = new OBJ_Key();
         gp.obj[2].worldX = gp.tileSize * 38;
         gp.obj[2].worldY = gp.tileSize * 7;
 
