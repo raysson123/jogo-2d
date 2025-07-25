@@ -48,7 +48,7 @@ public class Inimigo extends Entity {
 
     private int contadorDano = 0;
 
-    private final int intervaloDano = 120; // 2 segundos (60 FPS)
+    private final int intervaloDano = 60; // 2 segundos (60 FPS)
 
 
 
@@ -316,7 +316,7 @@ public class Inimigo extends Entity {
 
             if (contadorDano >= intervaloDano) {
 
-                gp.player.vida = Math.max(0, gp.player.vida - 1);
+                gp.player.vida = Math.max(0, gp.player.vida - 5);
 
                 gp.player.invulneravel = true;
 

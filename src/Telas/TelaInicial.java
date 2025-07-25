@@ -1,4 +1,6 @@
-package MAIN;
+package Telas;
+
+import MAIN.GamePanel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -8,7 +10,7 @@ import java.io.InputStream;
 public class TelaInicial {
 
     GamePanel gp;
-    public String[] options = {"Iniciar Jogo", "Ajuda", "Sobre", "Créditos", "Sair do jogo"};
+    public String[] options = {"Iniciar Jogo", "Ajuda", "Sair do jogo"};
 
     public int selectedOption = 0;
     public boolean active = true;

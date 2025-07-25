@@ -7,7 +7,7 @@ public class KeyHandler implements KeyListener {
 
     GamePanel gp;
     public boolean upPressed, downPressed, leftPressed, rightPressed;
-    public boolean spacePressed; // ✅ novo campo para disparar flecha
+    public boolean spacePressed;
 
     public KeyHandler(GamePanel gp) {
         this.gp = gp;
@@ -22,7 +22,7 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
 
-        // ✅ Navegação na tela inicial
+        // ✅ Tela Inicial
         if (gp.telaInicial.active) {
             if (code == KeyEvent.VK_W) {
                 gp.telaInicial.selectedOption--;
@@ -38,19 +38,40 @@ public class KeyHandler implements KeyListener {
                 }
             }
 
-            if (code == KeyEvent.VK_SPACE) {
+            if (code == KeyEvent.VK_SPACE || code == KeyEvent.VK_ENTER) {
                 gp.telaInicial.select();
             }
 
-            return; // ✅ Impede que outras teclas afetem o jogo enquanto na tela inicial
+            return;
         }
 
-        // ✅ Abrir ou fechar menu de pausa com ENTER
-        if (code == KeyEvent.VK_ENTER) {
-            gp.ui.pauseMenuOn = !gp.ui.pauseMenuOn;
+        // ✅ Tela de Game Over
+        if (gp.gameState == GamePanel.GAME_OVER_STATE) {
+            if (code == KeyEvent.VK_W) {
+                gp.gameOverScreen.selectedOption--;
+                if (gp.gameOverScreen.selectedOption < 0) {
+                    gp.gameOverScreen.selectedOption = gp.gameOverScreen.options.length - 1;
+                }
+            }
+
+            if (code == KeyEvent.VK_S) {
+                gp.gameOverScreen.selectedOption++;
+                if (gp.gameOverScreen.selectedOption >= gp.gameOverScreen.options.length) {
+                    gp.gameOverScreen.selectedOption = 0;
+                }
+            }
+
+            if (code == KeyEvent.VK_SPACE || code == KeyEvent.VK_ENTER) {
+                switch (gp.gameOverScreen.selectedOption) {
+                    case 0 -> gp.restartGame(); // Reiniciar
+                    case 1 -> System.exit(0);   // Sair
+                }
+            }
+
+            return;
         }
 
-        // ✅ Navegação no menu de pausa
+        // ✅ Menu de Pausa
         if (gp.ui.pauseMenuOn) {
             if (code == KeyEvent.VK_W) {
                 gp.ui.selectedOption--;
@@ -62,7 +83,7 @@ public class KeyHandler implements KeyListener {
                 if (gp.ui.selectedOption >= gp.ui.pauseOptions.length) gp.ui.selectedOption = 0;
             }
 
-            if (code == KeyEvent.VK_SPACE) {
+            if (code == KeyEvent.VK_SPACE || code == KeyEvent.VK_ENTER) {
                 switch (gp.ui.selectedOption) {
                     case 0 -> gp.ui.pauseMenuOn = false;
                     case 1 -> gp.restartGame();
@@ -71,16 +92,19 @@ public class KeyHandler implements KeyListener {
                 }
             }
 
-            return; // ✅ Impede que outras teclas afetem o jogo enquanto no menu de pausa
+            return;
         }
 
-        // ✅ Movimentação do jogador
+        // ✅ Abrir/fechar pausa com ENTER
+        if (code == KeyEvent.VK_ENTER) {
+            gp.ui.pauseMenuOn = !gp.ui.pauseMenuOn;
+        }
+
+        // ✅ Controles do jogador
         if (code == KeyEvent.VK_W) upPressed = true;
         if (code == KeyEvent.VK_S) downPressed = true;
         if (code == KeyEvent.VK_A) leftPressed = true;
         if (code == KeyEvent.VK_D) rightPressed = true;
-
-        // ✅ Disparo de flecha
         if (code == KeyEvent.VK_SPACE) spacePressed = true;
     }
 
@@ -92,6 +116,6 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_S) downPressed = false;
         if (code == KeyEvent.VK_A) leftPressed = false;
         if (code == KeyEvent.VK_D) rightPressed = false;
-        if (code == KeyEvent.VK_SPACE) spacePressed = false; // ✅ libera espaço
+        if (code == KeyEvent.VK_SPACE) spacePressed = false;
     }
 }

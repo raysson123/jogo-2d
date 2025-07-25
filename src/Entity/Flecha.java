@@ -11,9 +11,8 @@ import java.io.InputStream;
 public class Flecha extends Entity {
 
     public boolean ativa = true;
-
     public int tempoAceleracao = 0;
-    public final int tempoMaximoAntesDeAcelerar = 40;   // tepode  de retado de rederisaçãom
+    public final int tempoMaximoAntesDeAcelerar = 40;
 
     public Flecha(GamePanel gp, int startX, int startY, String direction) {
         super(gp);
@@ -32,7 +31,6 @@ public class Flecha extends Entity {
 
         carregarSprites();
     }
-
 
     private void carregarSprites() {
         try {
@@ -60,25 +58,24 @@ public class Flecha extends Entity {
 
     public void update() {
         if (!ativa) return;
+
         if (tempoAceleracao < tempoMaximoAntesDeAcelerar) {
             tempoAceleracao++;
         } else {
-            speed = 4; // Acelera após X frames
+            speed = 4;
         }
-        collisiOn = false; // ✅ Corrigido (antes: collisiOn)
-        gp.cChecker.checkTile(this);
 
         collisiOn = false;
         gp.cChecker.checkTile(this);
 
-        // ✅ Verifica colisão com inimigos
+        // Verifica colisão com inimigos
         int index = gp.cChecker.checkInimigo(this);
         if (index != -1) {
-            gp.inimigos[index].sofrerDano(1); // tira 1 de vida
+            gp.inimigos[index].sofrerDano(1);
             if (gp.inimigos[index].vida <= 0) {
-                gp.player.xp += 3; // dá 3 de XP ao jogador
+                gp.player.ganharXP(9); // ✅ usa método atualizado
             }
-            ativa = false; // flecha desaparece após atingir
+            ativa = false;
             return;
         }
 
@@ -99,6 +96,7 @@ public class Flecha extends Entity {
             spriteCounter = 0;
         }
     }
+
     public void draw(Graphics2D g2) {
         if (!ativa) return;
 
@@ -110,9 +108,8 @@ public class Flecha extends Entity {
             default -> null;
         };
 
-        if (image == null) return; // evita erro se imagem não carregou
+        if (image == null) return;
 
-        // Calcula posição relativa ao jogador
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);

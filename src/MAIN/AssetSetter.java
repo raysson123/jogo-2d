@@ -62,5 +62,22 @@ public class AssetSetter {
         gp.inimigos[1] = new Inimigo(gp);
         gp.inimigos[1].worldX = gp.tileSize * 23;
         gp.inimigos[1].worldY = gp.tileSize * (40 + 2); // 42
+
+
+        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
+        gp.inimigos[2] = new Inimigo(gp);
+        gp.inimigos[2].worldX = gp.tileSize * 38;
+        gp.inimigos[2].worldY = gp.tileSize * (6 + 2); // 42
+
+        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
+        gp.inimigos[3] = new Inimigo(gp);
+        gp.inimigos[3].worldX = gp.tileSize * 11;
+        gp.inimigos[3].worldY = gp.tileSize * (28 + 2); // 42
+
+        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
+        gp.inimigos[4] = new Inimigo(gp);
+        gp.inimigos[4].worldX = gp.tileSize * 10;
+        gp.inimigos[4].worldY = gp.tileSize * (28 + 2); // 42
+
     }
 }

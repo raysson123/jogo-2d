@@ -2,7 +2,10 @@ package MAIN;
 
 import Entity.Player;
 import Entity.Inimigo;
-import Entity.Flecha; // ✅ Importa a nova entidade flecha
+import Entity.Flecha;
+import Telas.GameOverScreen;
+import Telas.TelaFim;
+import Telas.TelaInicial;
 import object.SuperObject;
 import title.TileManager;
 
@@ -23,6 +26,12 @@ public class GamePanel extends JPanel implements Runnable {
     public final int maxWorldCol = 50;
     public final int maxWorldRow = 50;
 
+    // --- Estados do Jogo ---
+    public static final int PLAY_STATE = 0;
+    public static final int PAUSE_STATE = 1;
+    public static final int GAME_OVER_STATE = 2;
+    public int gameState = PLAY_STATE;
+
     // --- Sistema de Jogo ---
     TileManager tileM = new TileManager(this);
     Thread gameThread;
@@ -37,13 +46,15 @@ public class GamePanel extends JPanel implements Runnable {
     public Player player = new Player(this, keyH);
     public SuperObject[] obj = new SuperObject[10];
     public Inimigo[] inimigos = new Inimigo[10];
-    public Flecha[] flechas = new Flecha[10]; // ✅ Array de flechas
+    public Flecha[] flechas = new Flecha[10];
 
     // --- FPS ---
     int FPS = 60;
 
-    // --- Tela Inicial ---
+    // --- Telas ---
     public TelaInicial telaInicial = new TelaInicial(this);
+    public GameOverScreen gameOverScreen = new GameOverScreen(this);
+    public TelaFim telaFim = new TelaFim(this); // ✅ nova tela de fim
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -89,20 +100,30 @@ public class GamePanel extends JPanel implements Runnable {
     public void update() {
         if (telaInicial.active) return;
 
-        if (!ui.pauseMenuOn) {
-            player.update();
+        if (telaFim.active) {
+            telaFim.update(); // ✅ atualiza contador da tela final
+            return;
+        }
 
-            for (Inimigo inimigo : inimigos) {
-                if (inimigo != null) {
-                    inimigo.update();
-                }
+        if (gameState == GAME_OVER_STATE) return;
+        if (gameState == PAUSE_STATE) return;
+
+        player.update();
+
+        if (player.vida <= 0) {
+            gameState = GAME_OVER_STATE;
+            return;
+        }
+
+        for (Inimigo inimigo : inimigos) {
+            if (inimigo != null) {
+                inimigo.update();
             }
+        }
 
-            // ✅ Atualiza flechas
-            for (Flecha flecha : flechas) {
-                if (flecha != null && flecha.ativa) {
-                    flecha.update();
-                }
+        for (Flecha flecha : flechas) {
+            if (flecha != null && flecha.ativa) {
+                flecha.update();
             }
         }
     }
@@ -114,6 +135,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (telaInicial.active) {
             telaInicial.draw(g2);
+        } else if (telaFim.active) {
+            telaFim.draw(g2); // ✅ desenha tela de fim
+        } else if (gameState == GAME_OVER_STATE) {
+            gameOverScreen.draw(g2);
         } else {
             tileM.draw(g2);
 
@@ -129,7 +154,6 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
-            // ✅ Desenha flechas
             for (Flecha flecha : flechas) {
                 if (flecha != null && flecha.ativa) {
                     flecha.draw(g2);
@@ -162,7 +186,9 @@ public class GamePanel extends JPanel implements Runnable {
         player.setValoresIniciais();
         aSetter.setObject();
         aSetter.setInimigos();
-        ui.pauseMenuOn = false;
+        gameState = PLAY_STATE;
+        gameOverScreen.selectedOption = 0;
+        telaFim.active = false; // ✅ reseta tela de fim
         System.out.println("Jogo reiniciado");
     }
 }
