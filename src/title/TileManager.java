@@ -19,11 +19,52 @@ public class TileManager {
     public TileManager(GamePanel gp) {
         this.gp = gp;
 
-        tile = new Tile[10]; // Ex: Supondo que você terá 10 tipos diferentes de tiles
+        tile = new Tile[100]; // Ex: Supondo que você terá 10 tipos diferentes de tiles
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow]; // O mapa terá o tamanho do mundo (não da tela!)
 
-        getTileImage(); // Carrega as imagens dos tiles
-        loadMap("/maps/world01.txt"); // Carrega o mapa a partir de um arquivo (crie a pasta 'maps' e o arquivo 'world01.txt')
+        //getTileImage(); // Carrega as imagens dos tiles
+        chemap("world01");
+
+    }
+
+    public void chemap(String nomeMap){
+        loadMap("/maps/"+nomeMap+".txt");
+        getTileConfigImg("/confg/"+nomeMap+"_config_tele.txt");
+
+    }
+
+    private void getTileConfigImg(String configPath) {
+        try {
+            InputStream is = TileManager.class.getResourceAsStream(configPath);
+            if (is == null) {
+                System.err.println("Arquivo de config não encontrado: " + configPath);
+                return;
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) continue;
+
+                String[] parts = line.split(";");
+                int id = Integer.parseInt(parts[0]);
+                String imgPath = parts[1];
+                boolean collision = Boolean.parseBoolean(parts[2]);
+
+                tile[id] = new Tile();
+                tile[id].image = ImageIO.read(getClass().getResourceAsStream(imgPath));
+                tile[id].collision = collision;
+            }
+
+            br.close();
+            System.out.println("Config de tiles carregada: " + configPath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Erro leitura config tiles: " + e.getMessage());
+            }
     }
 
     public void getTileImage() {

@@ -1,0 +1,7 @@
+# id;path;collision
+0;/tiles/map1/grass.png;false
+1;/tiles/map1/wall.png;true
+2;/tiles/map1/water.png;true
+3;/tiles/map1/earth.png;false
+4;/tiles/map1/tree.png;true
+5;/tiles/map1/sand.png;false

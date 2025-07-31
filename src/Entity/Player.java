@@ -12,19 +12,23 @@ public class Player extends Entity {
     GamePanel gp;
     KeyHandler keyH;
 
+    // Posição fixa do jogador na tela (centro)
     public final int screenX;
     public final int screenY;
 
+    // Atributos do jogador
     public int hasKey = 0;
     public int xp = 0;
     public int vida = 10;
     public int vidaMaxima = 10;
     public int nivel = 1;
 
+    // Invulnerabilidade temporária após dano
     public boolean invulneravel = false;
     private int contadorInvulnerabilidade = 0;
     private final int duracaoInvulnerabilidade = 60;
 
+    // Controle de disparo de flechas
     private int contadorCooldownFlecha = 0;
     private final int tempoCooldownFlecha = 60;
     private final int LIMITE_FLECHAS = 5;
@@ -34,9 +38,11 @@ public class Player extends Entity {
         this.gp = gp;
         this.keyH = keyH;
 
+        // Centraliza o jogador na tela
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
 
+        // Define a área de colisão
         solidArea = new Rectangle();
         solidArea.x = 8;
         solidArea.y = 16;
@@ -48,6 +54,7 @@ public class Player extends Entity {
         setValoresIniciais();
     }
 
+    // Define os valores iniciais do jogador
     public void setValoresIniciais() {
         worldX = gp.tileSize * 23;
         worldY = gp.tileSize * 21;
@@ -61,7 +68,15 @@ public class Player extends Entity {
         contadorCooldownFlecha = 0;
     }
 
+    // Novo método para definir posição inicial ao trocar de mapa
+    public void setPosicaoInicial(int col, int row) {
+        worldX = col * gp.tileSize;
+        worldY = row * gp.tileSize;
+    }
+
+    // Atualiza o estado do jogador a cada frame
     public void update() {
+        // Movimento
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             if (keyH.upPressed) directin = "up";
             else if (keyH.downPressed) directin = "down";
@@ -83,6 +98,7 @@ public class Player extends Entity {
                 }
             }
 
+            // Animação de sprite
             spriteCounter++;
             if (spriteCounter > 12) {
                 spriteNum = (spriteNum == 1) ? 2 : 1;
@@ -90,10 +106,12 @@ public class Player extends Entity {
             }
         }
 
+        // Cooldown de flechas
         if (contadorCooldownFlecha > 0) {
             contadorCooldownFlecha--;
         }
 
+        // Disparo de flecha
         if (keyH.spacePressed) {
             if (contadorCooldownFlecha == 0) {
                 if (getFlechasAtivas() < LIMITE_FLECHAS) {
@@ -108,6 +126,7 @@ public class Player extends Entity {
             keyH.spacePressed = false;
         }
 
+        // Invulnerabilidade temporária
         if (invulneravel) {
             contadorInvulnerabilidade++;
             if (contadorInvulnerabilidade >= duracaoInvulnerabilidade) {
@@ -117,6 +136,7 @@ public class Player extends Entity {
         }
     }
 
+    // Conta flechas ativas na tela
     private int getFlechasAtivas() {
         int count = 0;
         for (Flecha f : gp.flechas) {
@@ -125,6 +145,7 @@ public class Player extends Entity {
         return count;
     }
 
+    // Cria uma nova flecha
     public void dispararFlecha() {
         int flechaX = worldX;
         int flechaY = worldY;
@@ -142,6 +163,7 @@ public class Player extends Entity {
         gp.playSE(5);
     }
 
+    // Interação com objetos
     public void pickUpObject(int i) {
         if (i >= 0 && i < gp.obj.size()) {
             if (gp.obj.get(i) == null) return;
@@ -169,13 +191,18 @@ public class Player extends Entity {
                     gp.playSE(2);
                     speed += 1;
                     gp.obj.set(i, null);
-                    gp.ui.showMessage("Você recebe os botas!");
+                    gp.ui.showMessage("Você recebeu as botas!");
                 }
-                case "Chest" -> gp.telaFim.active = true;
+                case "Chest" -> {
+                    //gp.playSE(6); // Som de baú (se existir)
+                    gp.ui.showMessage("Você abriu o baú e foi transportado!");
+                    gp.trocarMapa("world02"); // Troca para o mapa 2
+                }
             }
         }
     }
 
+    // Desenha o jogador na tela
     public void draw(Graphics2D g2) {
         BufferedImage image = switch (directin) {
             case "up" -> (spriteNum == 1) ? Spritesheet.playerCima1 : Spritesheet.playerCima2;
@@ -185,25 +212,23 @@ public class Player extends Entity {
             default -> null;
         };
 
-        // Desenha o sprite do player
+        // Pisca o jogador se estiver invulnerável
         if (!invulneravel || (contadorInvulnerabilidade % 10 < 5)) {
             g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
         }
 
-        // 🟥⬜ Desenha a hitbox por cima do sprite
-        //int hitboxX = screenX + solidArea.x;
-        //int hitboxY = screenY + solidArea.y;
-
-        // Preenchimento branco
-        //g2.setColor(new Color(255, 255, 255, 100)); // semitransparente
-        //g2.fillRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
-
-        // Borda vermelha
-        //g2.setColor(Color.RED);
-        //g2.drawRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
+        // Hitbox opcional (comentado)
+        /*
+        int hitboxX = screenX + solidArea.x;
+        int hitboxY = screenY + solidArea.y;
+        g2.setColor(new Color(255, 255, 255, 100));
+        g2.fillRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
+        g2.setColor(Color.RED);
+        g2.drawRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
+        */
     }
 
-
+    // Ganha XP e sobe de nível
     public void ganharXP(int quantidade) {
         xp += quantidade;
         gp.ui.showMessage("Você ganhou " + quantidade + " XP!");

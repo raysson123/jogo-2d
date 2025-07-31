@@ -25,6 +25,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenWidth = tileSize * maxScreenCol;
     public final int screenHeight = tileSize * maxScreenRow;
 
+    // --- Configurações do Mundo ---
     public final int maxWorldCol = 50;
     public final int maxWorldRow = 50;
 
@@ -33,6 +34,9 @@ public class GamePanel extends JPanel implements Runnable {
     public static final int PAUSE_STATE = 1;
     public static final int GAME_OVER_STATE = 2;
     public int gameState = PLAY_STATE;
+
+    // --- Controle de Mapa Atual ---
+    public String nomeMapaAtual = "world01"; // usado para lógica condicional
 
     // --- Sistema de Jogo ---
     public KeyHandler keyH = new KeyHandler(this);
@@ -119,23 +123,17 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
-        // Atualiza inimigos
-        for (Inimigo inimigo : inimigos) {
-            if (inimigo != null) {
-                inimigo.update();
+        // ✅ Só atualiza inimigos e flechas se estiver no mapa "world01"
+        if (nomeMapaAtual.equals("world01")) {
+            for (Inimigo inimigo : inimigos) {
+                if (inimigo != null) inimigo.update();
             }
-        }
+            inimigos.removeIf(inimigo -> !inimigo.ativo);
 
-        // ✅ Remove inimigos mortos
-        inimigos.removeIf(inimigo -> !inimigo.ativo);
+            flechas.removeIf(f -> !f.ativa);
 
-        // ✅ Remove flechas inativas para evitar lixo na lista
-        flechas.removeIf(f -> !f.ativa);
-
-        // Atualiza flechas
-        for (Flecha flecha : flechas) {
-            if (flecha != null && flecha.ativa) {
-                flecha.update();
+            for (Flecha flecha : flechas) {
+                if (flecha != null && flecha.ativa) flecha.update();
             }
         }
     }
@@ -152,16 +150,21 @@ public class GamePanel extends JPanel implements Runnable {
         } else if (gameState == GAME_OVER_STATE) {
             gameOverScreen.draw(g2);
         } else {
+            // ✅ Sempre desenha o mapa
             tileM.draw(g2);
 
-            for (SuperObject objeto : obj) {
-                if (objeto != null) objeto.draw(g2, this);
+            // ✅ Só desenha objetos e inimigos se estiver no mapa "world01"
+            if (nomeMapaAtual.equals("world01")) {
+                for (SuperObject objeto : obj) {
+                    if (objeto != null) objeto.draw(g2, this);
+                }
+
+                for (Inimigo inimigo : inimigos) {
+                    if (inimigo != null) inimigo.draw(g2);
+                }
             }
 
-            for (Inimigo inimigo : inimigos) {
-                if (inimigo != null) inimigo.draw(g2);
-            }
-
+            // ✅ Flechas podem ser desenhadas em qualquer mapa
             for (Flecha flecha : flechas) {
                 if (flecha != null && flecha.ativa) flecha.draw(g2);
             }
@@ -171,6 +174,42 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         g2.dispose();
+    }
+
+    // 🔍 Define a posição de spawn do jogador para cada mapa
+    private Point getSpawnPosition(String nomeMapa) {
+        switch (nomeMapa) {
+            case "world01":
+                return new Point(5, 5); // posição padrão
+            case "world02":
+                return new Point(19, 20); // posição personalizada para mapa 2
+            // 🧩 Adicione mais mapas aqui conforme necessário
+            default:
+                return new Point(0, 0); // fallback seguro
+        }
+    }
+
+    // 🔁 Troca de mapa com controle de conteúdo e posição inicial
+    public void trocarMapa(String nomeMapa) {
+        obj.clear();
+        inimigos.clear();
+        flechas.clear();
+
+        nomeMapaAtual = nomeMapa;
+
+        tileM.chemap(nomeMapa);
+
+        // 🧭 Define a posição inicial do jogador com base no mapa
+        Point spawn = getSpawnPosition(nomeMapa);
+        player.setPosicaoInicial(spawn.x, spawn.y);
+
+        // 🎯 Só carrega objetos e inimigos se for o mapa "world01"
+        if (nomeMapaAtual.equals("world01")) {
+            aSetter.setObject();
+            aSetter.setInimigos();
+        }
+
+        System.out.println("Mapa trocado para: " + nomeMapa + " | Spawn: col " + spawn.x + ", row " + spawn.y);
     }
 
     public void playMusic(int i) {
@@ -198,6 +237,12 @@ public class GamePanel extends JPanel implements Runnable {
         gameState = PLAY_STATE;
         gameOverScreen.selectedOption = 0;
         telaFim.active = false;
-        System.out.println("Jogo reiniciado");
+        nomeMapaAtual = "world01";
+
+        // 🔄 Reposiciona o jogador no spawn do mapa inicial
+        Point spawn = getSpawnPosition(nomeMapaAtual);
+        player.setPosicaoInicial(spawn.x, spawn.y);
+
+        System.out.println("Jogo reiniciado | Spawn: col " + spawn.x + ", row " + spawn.y);
     }
 }
