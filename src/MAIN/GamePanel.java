@@ -44,8 +44,8 @@ public class GamePanel extends JPanel implements Runnable {
     public CollisionChecker cChecker = new CollisionChecker(this);
     public AssetSetter aSetter = new AssetSetter(this);
     public UI ui = new UI(this);
-    Sound music = new Sound();
-    Sound se = new Sound();
+    public Sound music = new Sound(); // Música de fundo
+    public Sound se = new Sound();    // Efeitos sonoros
     Thread gameThread;
 
     // --- Entidades ---
@@ -73,12 +73,13 @@ public class GamePanel extends JPanel implements Runnable {
         Spritesheet.carregarSprites();
     }
 
+    // 🔧 Inicializa os objetos e inimigos do mapa inicial
     public void setupGame() {
         aSetter.setObject();
         inimigos.clear(); // Evita duplicatas
         inimigos.add(new Inimigo(this));
         aSetter.setInimigos();
-        playMusic(0);
+        playMusic(0); // Música do mapa inicial
     }
 
     public void startGameThread() {
@@ -107,6 +108,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    // 🔁 Atualiza entidades do jogo conforme o estado e mapa atual
     public void update() {
         if (telaInicial.active) return;
         if (telaFim.active) {
@@ -123,7 +125,7 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
-        // ✅ Só atualiza inimigos e flechas se estiver no mapa "world01"
+        // ✅ Atualiza inimigos e flechas apenas no mapa "world01"
         if (nomeMapaAtual.equals("world01")) {
             for (Inimigo inimigo : inimigos) {
                 if (inimigo != null) inimigo.update();
@@ -153,12 +155,13 @@ public class GamePanel extends JPanel implements Runnable {
             // ✅ Sempre desenha o mapa
             tileM.draw(g2);
 
-            // ✅ Só desenha objetos e inimigos se estiver no mapa "world01"
-            if (nomeMapaAtual.equals("world01")) {
-                for (SuperObject objeto : obj) {
-                    if (objeto != null) objeto.draw(g2, this);
-                }
+            // ✅ Desenha todos os objetos, independentemente do mapa
+            for (SuperObject objeto : obj) {
+                if (objeto != null) objeto.draw(g2, this);
+            }
 
+            // ✅ Desenha inimigos apenas no mapa "world01"
+            if (nomeMapaAtual.equals("world01")) {
                 for (Inimigo inimigo : inimigos) {
                     if (inimigo != null) inimigo.draw(g2);
                 }
@@ -178,18 +181,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     // 🔍 Define a posição de spawn do jogador para cada mapa
     private Point getSpawnPosition(String nomeMapa) {
-        switch (nomeMapa) {
-            case "world01":
-                return new Point(5, 5); // posição padrão
-            case "world02":
-                return new Point(19, 20); // posição personalizada para mapa 2
-            // 🧩 Adicione mais mapas aqui conforme necessário
-            default:
-                return new Point(0, 0); // fallback seguro
-        }
+        return switch (nomeMapa) {
+            case "world01" -> new Point(5, 5);
+            case "world02" -> new Point(19, 20);
+            default -> new Point(0, 0); // fallback seguro
+        };
     }
 
-    // 🔁 Troca de mapa com controle de conteúdo e posição inicial
+    // 🔁 Troca de mapa com controle de conteúdo, posição e música
     public void trocarMapa(String nomeMapa) {
         obj.clear();
         inimigos.clear();
@@ -203,15 +202,26 @@ public class GamePanel extends JPanel implements Runnable {
         Point spawn = getSpawnPosition(nomeMapa);
         player.setPosicaoInicial(spawn.x, spawn.y);
 
-        // 🎯 Só carrega objetos e inimigos se for o mapa "world01"
+        // 🎯 Carrega os elementos específicos de cada mapa
         if (nomeMapaAtual.equals("world01")) {
             aSetter.setObject();
             aSetter.setInimigos();
+            trocarMusicaMapa(0); // Música do mapa 1
+        } else if (nomeMapaAtual.equals("world02")) {
+            aSetter.setNPC();
+            trocarMusicaMapa(6); // Música do mapa 2
         }
 
         System.out.println("Mapa trocado para: " + nomeMapa + " | Spawn: col " + spawn.x + ", row " + spawn.y);
     }
 
+    // 🔊 Troca a música do mapa atual
+    private void trocarMusicaMapa(int musicaIndex) {
+        stopMusic();     // Para a música anterior
+        playMusic(musicaIndex); // Inicia a nova música
+    }
+
+    // 🔊 Controle de música e efeitos sonoros
     public void playMusic(int i) {
         music.setFile(i);
         music.play();
@@ -227,6 +237,7 @@ public class GamePanel extends JPanel implements Runnable {
         se.play();
     }
 
+    // 🔄 Reinicia o jogo e reseta os elementos
     public void restartGame() {
         player.setValoresIniciais();
         obj.clear();
@@ -239,9 +250,10 @@ public class GamePanel extends JPanel implements Runnable {
         telaFim.active = false;
         nomeMapaAtual = "world01";
 
-        // 🔄 Reposiciona o jogador no spawn do mapa inicial
         Point spawn = getSpawnPosition(nomeMapaAtual);
         player.setPosicaoInicial(spawn.x, spawn.y);
+
+        trocarMusicaMapa(0); // Reinicia com música do mapa 1
 
         System.out.println("Jogo reiniciado | Spawn: col " + spawn.x + ", row " + spawn.y);
     }

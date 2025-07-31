@@ -2,10 +2,7 @@ package MAIN;
 
 import Entity.Inimigo;
 import Entity.Lobo;
-import object.OBJ_Boots;
-import object.OBJ_Chest;
-import object.OBJ_Door;
-import object.OBJ_Key;
+import object.*;
 
 public class AssetSetter {
     GamePanel gp;
@@ -91,4 +88,13 @@ public class AssetSetter {
         lobo.worldY = gp.tileSize * 32; // 30 + 2
         gp.inimigos.add(lobo);
     }
+    public void setNPC() {
+        NPC npc = new NPC();
+        npc.worldX = gp.tileSize * 14; // 11 + 2
+        npc.worldY = gp.tileSize * 12; // 30 + 2
+        gp.obj.add(npc);
+
+    }
+
+
 }

@@ -194,10 +194,15 @@ public class Player extends Entity {
                     gp.ui.showMessage("Você recebeu as botas!");
                 }
                 case "Chest" -> {
-                    //gp.playSE(6); // Som de baú (se existir)
+                    gp.playSE(6); // Som de baú (se existir)
                     gp.ui.showMessage("Você abriu o baú e foi transportado!");
                     gp.trocarMapa("world02"); // Troca para o mapa 2
                 }
+                case "NPC" -> {
+
+                    gp.telaFim.active = true;
+                }
+
             }
         }
     }
