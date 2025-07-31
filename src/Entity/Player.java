@@ -2,12 +2,10 @@ package Entity;
 
 import MAIN.GamePanel;
 import MAIN.KeyHandler;
+import util.Spritesheet;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class Player extends Entity {
 
@@ -27,6 +25,10 @@ public class Player extends Entity {
     private int contadorInvulnerabilidade = 0;
     private final int duracaoInvulnerabilidade = 60;
 
+    private int contadorCooldownFlecha = 0;
+    private final int tempoCooldownFlecha = 60;
+    private final int LIMITE_FLECHAS = 5;
+
     public Player(GamePanel gp, KeyHandler keyH) {
         super(gp);
         this.gp = gp;
@@ -44,7 +46,6 @@ public class Player extends Entity {
         solidArea.height = 32;
 
         setValoresIniciais();
-        loadPlayerImages();
     }
 
     public void setValoresIniciais() {
@@ -57,35 +58,11 @@ public class Player extends Entity {
         vidaMaxima = 10;
         vida = vidaMaxima;
         nivel = 1;
-    }
-
-    private void loadPlayerImages() {
-        try {
-            up1 = loadImage("/player/arqueiroCima-1.png");
-            up2 = loadImage("/player/arqueiroCima-2.png");
-            down1 = loadImage("/player/arqueiroBai-1.png");
-            down2 = loadImage("/player/arqueiroBai-2.png");
-            left1 = loadImage("/player/arqueiroEsq-1.png");
-            left2 = loadImage("/player/arqueiroEsq-2.png");
-            right1 = loadImage("/player/arqueiroDir-1.png");
-            right2 = loadImage("/player/arqueiroDir-2.png");
-        } catch (IOException | IllegalArgumentException e) {
-            System.err.println("Erro ao carregar as imagens do jogador: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private BufferedImage loadImage(String path) throws IOException {
-        InputStream is = getClass().getResourceAsStream(path);
-        if (is == null) {
-            throw new IllegalArgumentException("Imagem não encontrada: " + path);
-        }
-        return ImageIO.read(is);
+        contadorCooldownFlecha = 0;
     }
 
     public void update() {
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
-
             if (keyH.upPressed) directin = "up";
             else if (keyH.downPressed) directin = "down";
             else if (keyH.leftPressed) directin = "left";
@@ -113,8 +90,21 @@ public class Player extends Entity {
             }
         }
 
+        if (contadorCooldownFlecha > 0) {
+            contadorCooldownFlecha--;
+        }
+
         if (keyH.spacePressed) {
-            dispararFlecha();
+            if (contadorCooldownFlecha == 0) {
+                if (getFlechasAtivas() < LIMITE_FLECHAS) {
+                    dispararFlecha();
+                    contadorCooldownFlecha = tempoCooldownFlecha;
+                } else {
+                    gp.ui.showMessage("Você já tem muitas flechas na tela!");
+                }
+            } else {
+                gp.ui.showMessage("Aguarde para disparar novamente!");
+            }
             keyH.spacePressed = false;
         }
 
@@ -127,34 +117,48 @@ public class Player extends Entity {
         }
     }
 
+    private int getFlechasAtivas() {
+        int count = 0;
+        for (Flecha f : gp.flechas) {
+            if (f != null && f.ativa) count++;
+        }
+        return count;
+    }
+
     public void dispararFlecha() {
         int flechaX = worldX;
         int flechaY = worldY;
 
-        for (int i = 0; i < gp.flechas.length; i++) {
-            if (gp.flechas[i] == null || !gp.flechas[i].ativa) {
-                gp.flechas[i] = new Flecha(gp, flechaX, flechaY, directin);
+        for (int i = 0; i < gp.flechas.size(); i++) {
+            Flecha f = gp.flechas.get(i);
+            if (f == null || !f.ativa) {
+                gp.flechas.set(i, new Flecha(gp, flechaX, flechaY, directin));
                 gp.playSE(5);
-                break;
+                return;
             }
         }
+
+        gp.flechas.add(new Flecha(gp, flechaX, flechaY, directin));
+        gp.playSE(5);
     }
 
     public void pickUpObject(int i) {
-        if (i != 999) {
-            String objectName = gp.obj[i].name;
+        if (i >= 0 && i < gp.obj.size()) {
+            if (gp.obj.get(i) == null) return;
+
+            String objectName = gp.obj.get(i).name;
 
             switch (objectName) {
                 case "Key" -> {
                     gp.playSE(1);
                     hasKey++;
-                    gp.obj[i] = null;
+                    gp.obj.set(i, null);
                     gp.ui.showMessage("Você tem uma chave!");
                 }
                 case "Door" -> {
                     if (hasKey > 0) {
                         gp.playSE(3);
-                        gp.obj[i] = null;
+                        gp.obj.set(i, null);
                         hasKey--;
                         gp.ui.showMessage("Você abre a porta!");
                     } else {
@@ -164,32 +168,42 @@ public class Player extends Entity {
                 case "Boots" -> {
                     gp.playSE(2);
                     speed += 1;
-                    gp.obj[i] = null;
+                    gp.obj.set(i, null);
                     gp.ui.showMessage("Você recebe os botas!");
                 }
-                case "Chest" -> {
-                    gp.telaFim.active = true;
-                }
+                case "Chest" -> gp.telaFim.active = true;
             }
         }
     }
 
     public void draw(Graphics2D g2) {
-        BufferedImage image = null;
+        BufferedImage image = switch (directin) {
+            case "up" -> (spriteNum == 1) ? Spritesheet.playerCima1 : Spritesheet.playerCima2;
+            case "down" -> (spriteNum == 1) ? Spritesheet.playerBaixo1 : Spritesheet.playerBaixo2;
+            case "left" -> (spriteNum == 1) ? Spritesheet.playerEsq1 : Spritesheet.playerEsq2;
+            case "right" -> (spriteNum == 1) ? Spritesheet.playerDir1 : Spritesheet.playerDir2;
+            default -> null;
+        };
 
-        switch (directin) {
-            case "up" -> image = (spriteNum == 1) ? up1 : up2;
-            case "down" -> image = (spriteNum == 1) ? down1 : down2;
-            case "left" -> image = (spriteNum == 1) ? left1 : left2;
-            case "right" -> image = (spriteNum == 1) ? right1 : right2;
-        }
-
+        // Desenha o sprite do player
         if (!invulneravel || (contadorInvulnerabilidade % 10 < 5)) {
             g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
         }
+
+        // 🟥⬜ Desenha a hitbox por cima do sprite
+        //int hitboxX = screenX + solidArea.x;
+        //int hitboxY = screenY + solidArea.y;
+
+        // Preenchimento branco
+        //g2.setColor(new Color(255, 255, 255, 100)); // semitransparente
+        //g2.fillRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
+
+        // Borda vermelha
+        //g2.setColor(Color.RED);
+        //g2.drawRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
     }
 
-    // ✅ Novo método para ganhar XP e subir de nível
+
     public void ganharXP(int quantidade) {
         xp += quantidade;
         gp.ui.showMessage("Você ganhou " + quantidade + " XP!");
@@ -201,7 +215,7 @@ public class Player extends Entity {
             vidaMaxima += 2;
             vida = vidaMaxima;
             gp.ui.showMessage("Você subiu para o nível " + nivel + "!");
-            gp.playSE(4); // som de evolução (se existir)
+            gp.playSE(4);
             xpParaProximoNivel = nivel * 15;
         }
     }

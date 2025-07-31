@@ -1,6 +1,7 @@
 package MAIN;
 
 import Entity.Inimigo;
+import Entity.Lobo;
 import object.OBJ_Boots;
 import object.OBJ_Chest;
 import object.OBJ_Door;
@@ -8,76 +9,82 @@ import object.OBJ_Key;
 
 public class AssetSetter {
     GamePanel gp;
-    public AssetSetter(GamePanel gp){
+
+    public AssetSetter(GamePanel gp) {
         this.gp = gp;
     }
-    
-    
-    
-    public void setObject(){
-        gp.obj[0] = new OBJ_Key();
-        gp.obj[0].worldX = gp.tileSize * 23;
-        gp.obj[0].worldY = gp.tileSize * 7;
 
-        gp.obj[1] = new OBJ_Key();
-        gp.obj[1].worldX = gp.tileSize * 23;
-        gp.obj[1].worldY = gp.tileSize * 40;
-        
-        
+    public void setObject() {
+        OBJ_Key key1 = new OBJ_Key();
+        key1.worldX = gp.tileSize * 23;
+        key1.worldY = gp.tileSize * 7;
+        gp.obj.add(key1);
 
-        gp.obj[2] = new OBJ_Key();
-        gp.obj[2].worldX = gp.tileSize * 38;
-        gp.obj[2].worldY = gp.tileSize * 7;
+        OBJ_Key key2 = new OBJ_Key();
+        key2.worldX = gp.tileSize * 23;
+        key2.worldY = gp.tileSize * 40;
+        gp.obj.add(key2);
 
-        gp.obj[3] = new OBJ_Door();
-        gp.obj[3].worldX = gp.tileSize * 10;
-        gp.obj[3].worldY = gp.tileSize * 11;
+        OBJ_Key key3 = new OBJ_Key();
+        key3.worldX = gp.tileSize * 38;
+        key3.worldY = gp.tileSize * 7;
+        gp.obj.add(key3);
 
-        gp.obj[4] = new OBJ_Door();
-        gp.obj[4].worldX = gp.tileSize * 8;
-        gp.obj[4].worldY = gp.tileSize * 28;
+        OBJ_Door door1 = new OBJ_Door();
+        door1.worldX = gp.tileSize * 10;
+        door1.worldY = gp.tileSize * 11;
+        gp.obj.add(door1);
 
-        gp.obj[5] = new OBJ_Door();
-        gp.obj[5].worldX = gp.tileSize * 12;
-        gp.obj[5].worldY = gp.tileSize * 22;
+        OBJ_Door door2 = new OBJ_Door();
+        door2.worldX = gp.tileSize * 8;
+        door2.worldY = gp.tileSize * 28;
+        gp.obj.add(door2);
 
-        gp.obj[6] = new OBJ_Chest();
-        gp.obj[6].worldX = gp.tileSize * 10;
-        gp.obj[6].worldY = gp.tileSize * 7;
+        OBJ_Door door3 = new OBJ_Door();
+        door3.worldX = gp.tileSize * 12;
+        door3.worldY = gp.tileSize * 22;
+        gp.obj.add(door3);
 
-        gp.obj[7] = new OBJ_Boots();
-        gp.obj[7].worldX = gp.tileSize * 37;
-        gp.obj[7].worldY = gp.tileSize * 42;
+        OBJ_Chest chest = new OBJ_Chest();
+        chest.worldX = gp.tileSize * 10;
+        chest.worldY = gp.tileSize * 7;
+        gp.obj.add(chest);
 
-
+        OBJ_Boots boots = new OBJ_Boots();
+        boots.worldX = gp.tileSize * 37;
+        boots.worldY = gp.tileSize * 42;
+        gp.obj.add(boots);
     }
-    
+
     public void setInimigos() {
-        // Inimigo perto da chave 1 (tile 23,7) -> colocamos 2 tiles à direita (X + 2)
-        gp.inimigos[0] = new Inimigo(gp);
-        gp.inimigos[0].worldX = gp.tileSize * (23 + 2); // 25
-        gp.inimigos[0].worldY = gp.tileSize * 7;
+        Inimigo inimigo1 = new Inimigo(gp);
+        inimigo1.worldX = gp.tileSize * 25; // 23 + 2
+        inimigo1.worldY = gp.tileSize * 7;
+        gp.inimigos.add(inimigo1);
 
-        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
-        gp.inimigos[1] = new Inimigo(gp);
-        gp.inimigos[1].worldX = gp.tileSize * 23;
-        gp.inimigos[1].worldY = gp.tileSize * (40 + 2); // 42
+        Inimigo inimigo2 = new Inimigo(gp);
+        inimigo2.worldX = gp.tileSize * 23;
+        inimigo2.worldY = gp.tileSize * 42; // 40 + 2
+        gp.inimigos.add(inimigo2);
 
+        Inimigo inimigo3 = new Inimigo(gp);
+        inimigo3.worldX = gp.tileSize * 38;
+        inimigo3.worldY = gp.tileSize * 8; // 6 + 2
+        gp.inimigos.add(inimigo3);
 
-        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
-        gp.inimigos[2] = new Inimigo(gp);
-        gp.inimigos[2].worldX = gp.tileSize * 38;
-        gp.inimigos[2].worldY = gp.tileSize * (6 + 2); // 42
+        Inimigo inimigo4 = new Inimigo(gp);
+        inimigo4.worldX = gp.tileSize * 11;
+        inimigo4.worldY = gp.tileSize * 30; // 28 + 2
+        gp.inimigos.add(inimigo4);
 
-        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
-        gp.inimigos[3] = new Inimigo(gp);
-        gp.inimigos[3].worldX = gp.tileSize * 11;
-        gp.inimigos[3].worldY = gp.tileSize * (28 + 2); // 42
+        Inimigo inimigo5 = new Inimigo(gp);
+        inimigo5.worldX = gp.tileSize * 10;
+        inimigo5.worldY = gp.tileSize * 30; // 28 + 2
+        gp.inimigos.add(inimigo5);
 
-        // Inimigo perto da chave 2 (tile 23,40) -> colocamos 2 tiles abaixo (Y + 2)
-        gp.inimigos[4] = new Inimigo(gp);
-        gp.inimigos[4].worldX = gp.tileSize * 10;
-        gp.inimigos[4].worldY = gp.tileSize * (28 + 2); // 42
-
+        Lobo lobo = new Lobo(gp);
+        lobo.worldX = gp.tileSize * 13; // 11 + 2
+        lobo.worldY = gp.tileSize * 32; // 30 + 2
+        gp.inimigos.add(lobo);
     }
 }

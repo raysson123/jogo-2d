@@ -8,9 +8,11 @@ import Telas.TelaFim;
 import Telas.TelaInicial;
 import object.SuperObject;
 import title.TileManager;
+import util.Spritesheet;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -33,28 +35,28 @@ public class GamePanel extends JPanel implements Runnable {
     public int gameState = PLAY_STATE;
 
     // --- Sistema de Jogo ---
-    TileManager tileM = new TileManager(this);
-    Thread gameThread;
     public KeyHandler keyH = new KeyHandler(this);
-    Sound music = new Sound();
-    Sound se = new Sound();
-    public UI ui = new UI(this);
+    public TileManager tileM = new TileManager(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public AssetSetter aSetter = new AssetSetter(this);
+    public UI ui = new UI(this);
+    Sound music = new Sound();
+    Sound se = new Sound();
+    Thread gameThread;
 
     // --- Entidades ---
     public Player player = new Player(this, keyH);
-    public SuperObject[] obj = new SuperObject[10];
-    public Inimigo[] inimigos = new Inimigo[10];
-    public Flecha[] flechas = new Flecha[10];
-
-    // --- FPS ---
-    int FPS = 60;
+    public ArrayList<SuperObject> obj = new ArrayList<>();
+    public ArrayList<Inimigo> inimigos = new ArrayList<>();
+    public ArrayList<Flecha> flechas = new ArrayList<>();
 
     // --- Telas ---
     public TelaInicial telaInicial = new TelaInicial(this);
     public GameOverScreen gameOverScreen = new GameOverScreen(this);
-    public TelaFim telaFim = new TelaFim(this); // ✅ nova tela de fim
+    public TelaFim telaFim = new TelaFim(this);
+
+    // --- FPS ---
+    int FPS = 60;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -62,11 +64,15 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+
+        // ✅ Carrega os sprites uma única vez
+        Spritesheet.carregarSprites();
     }
 
     public void setupGame() {
         aSetter.setObject();
-        inimigos[0] = new Inimigo(this);
+        inimigos.clear(); // Evita duplicatas
+        inimigos.add(new Inimigo(this));
         aSetter.setInimigos();
         playMusic(0);
     }
@@ -99,14 +105,12 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         if (telaInicial.active) return;
-
         if (telaFim.active) {
-            telaFim.update(); // ✅ atualiza contador da tela final
+            telaFim.update();
             return;
         }
 
-        if (gameState == GAME_OVER_STATE) return;
-        if (gameState == PAUSE_STATE) return;
+        if (gameState == GAME_OVER_STATE || gameState == PAUSE_STATE) return;
 
         player.update();
 
@@ -115,12 +119,20 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
+        // Atualiza inimigos
         for (Inimigo inimigo : inimigos) {
             if (inimigo != null) {
                 inimigo.update();
             }
         }
 
+        // ✅ Remove inimigos mortos
+        inimigos.removeIf(inimigo -> !inimigo.ativo);
+
+        // ✅ Remove flechas inativas para evitar lixo na lista
+        flechas.removeIf(f -> !f.ativa);
+
+        // Atualiza flechas
         for (Flecha flecha : flechas) {
             if (flecha != null && flecha.ativa) {
                 flecha.update();
@@ -136,28 +148,22 @@ public class GamePanel extends JPanel implements Runnable {
         if (telaInicial.active) {
             telaInicial.draw(g2);
         } else if (telaFim.active) {
-            telaFim.draw(g2); // ✅ desenha tela de fim
+            telaFim.draw(g2);
         } else if (gameState == GAME_OVER_STATE) {
             gameOverScreen.draw(g2);
         } else {
             tileM.draw(g2);
 
             for (SuperObject objeto : obj) {
-                if (objeto != null) {
-                    objeto.draw(g2, this);
-                }
+                if (objeto != null) objeto.draw(g2, this);
             }
 
             for (Inimigo inimigo : inimigos) {
-                if (inimigo != null) {
-                    inimigo.draw(g2);
-                }
+                if (inimigo != null) inimigo.draw(g2);
             }
 
             for (Flecha flecha : flechas) {
-                if (flecha != null && flecha.ativa) {
-                    flecha.draw(g2);
-                }
+                if (flecha != null && flecha.ativa) flecha.draw(g2);
             }
 
             player.draw(g2);
@@ -184,11 +190,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void restartGame() {
         player.setValoresIniciais();
+        obj.clear();
+        inimigos.clear();
+        flechas.clear();
         aSetter.setObject();
         aSetter.setInimigos();
         gameState = PLAY_STATE;
         gameOverScreen.selectedOption = 0;
-        telaFim.active = false; // ✅ reseta tela de fim
+        telaFim.active = false;
         System.out.println("Jogo reiniciado");
     }
 }

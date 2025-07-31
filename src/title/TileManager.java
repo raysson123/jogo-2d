@@ -35,34 +35,34 @@ public class TileManager {
             // Tile 0: Grama (pode ser uma imagem verde)
             tile[0] = new Tile();
             // URL de placeholder para um quadrado verde: https://placehold.co/48x48/78C04A/000000?text=Grama
-            tile[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grass.png"));
+            tile[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/map1/grass.png"));
 
             // Tile 1: Parede (pode ser uma imagem cinza/marrom)
             tile[1] = new Tile();
             // URL de placeholder para um quadrado cinza: https://placehold.co/48x48/808080/000000?text=Parede
-            tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/wall.png"));
+            tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/map1/wall.png"));
             tile[1].collision = true; // Define como colisão verdadeira para evitar passar por essa tile
 
             // Tile 2: Água (pode ser uma imagem azul)
             tile[2] = new Tile();
             // URL de placeholder para um quadrado azul: https://placehold.co/48x48/66CCFF/000000?text=%C3%81gua
-            tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/water.png"));
+            tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/map1/water.png"));
             tile[2].collision = true; // Define como colisão verdadeira para evitar passar por essa tile
 
             // Tile 3: Chão (pode ser uma imagem marrom)
             tile[3] = new Tile();
             // URL de placeholder para um quadrado marrom: https://placehold.co/48x48/996633/000000?text=Ch%C3%A3o
-            tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/earth.png"));
+            tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/map1/earth.png"));
 
             // Tile 4: Árvore (pode ser uma imagem verde com folhas)
             tile[4] = new Tile();
             // URL de placeholder para um quadrado verde com folhas: https://placehold.co/48x48/78C04A/000000?text=%C3%81rvore
-            tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tree.png"));
+            tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/map1/tree.png"));
             tile[4].collision = true; // Define como colisão verdadeira para evitar passar por essa tile
 
             tile[5] = new Tile();
             // URL de placeholder para um quadrado verde com folhas: https://placehold.co/48x48/78C04A/000000?text=%C3%81rvore
-            tile[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/sand.png"));
+            tile[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/map1/sand.png"));
 
 
 

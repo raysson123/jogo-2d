@@ -1,12 +1,10 @@
 package Entity;
 
 import MAIN.GamePanel;
+import util.Spritesheet;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class Flecha extends Entity {
 
@@ -19,51 +17,36 @@ public class Flecha extends Entity {
         this.worldX = startX;
         this.worldY = startY;
         this.directin = direction;
-        this.speed = 1;
+        this.speed = 6;
 
+        // 🎯 Ajusta a hitbox conforme a direção da flecha
         solidArea = new Rectangle();
-        solidArea.x = 8;
-        solidArea.y = 8;
+        switch (directin) {
+            case "left", "right" -> {
+                solidArea.x = 8;
+                solidArea.y = 14;
+                solidArea.width = 32;
+                solidArea.height = 12;
+            }
+            case "up", "down" -> {
+                solidArea.x = 14;
+                solidArea.y = 8;
+                solidArea.width = 12;
+                solidArea.height = 32;
+            }
+            default -> {
+                solidArea.x = 8;
+                solidArea.y = 8;
+                solidArea.width = 32;
+                solidArea.height = 32;
+            }
+        }
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
-        solidArea.width = 32;
-        solidArea.height = 32;
-
-        carregarSprites();
-    }
-
-    private void carregarSprites() {
-        try {
-            up1 = carregarImagem("/flechas/flechaCima.png");
-            down1 = carregarImagem("/flechas/flechaBai.png");
-            left1 = carregarImagem("/flechas/flechaEsq.png");
-            right1 = carregarImagem("/flechas/flechaDir.png");
-
-            up2 = up1;
-            down2 = down1;
-            left2 = left1;
-            right2 = right1;
-        } catch (IOException | IllegalArgumentException e) {
-            System.err.println("Erro ao carregar sprites da flecha: " + e.getMessage());
-        }
-    }
-
-    private BufferedImage carregarImagem(String path) throws IOException {
-        InputStream is = getClass().getResourceAsStream(path);
-        if (is == null) {
-            throw new IllegalArgumentException("Imagem não encontrada: " + path);
-        }
-        return ImageIO.read(is);
     }
 
     public void update() {
         if (!ativa) return;
-
-        if (tempoAceleracao < tempoMaximoAntesDeAcelerar) {
-            tempoAceleracao++;
-        } else {
-            speed = 4;
-        }
 
         collisiOn = false;
         gp.cChecker.checkTile(this);
@@ -71,12 +54,16 @@ public class Flecha extends Entity {
         // Verifica colisão com inimigos
         int index = gp.cChecker.checkInimigo(this);
         if (index != -1) {
-            gp.inimigos[index].sofrerDano(1);
-            if (gp.inimigos[index].vida <= 0) {
-                gp.player.ganharXP(9); // ✅ usa método atualizado
+            Inimigo inimigo = (Inimigo) gp.inimigos.get(index);
+            if (inimigo.ativo) {
+                inimigo.sofrerDano(1);
+                if (inimigo.vida <= 0) {
+                    inimigo.ativo = false;
+                    gp.player.ganharXP(9);
+                }
+                ativa = false;
+                return;
             }
-            ativa = false;
-            return;
         }
 
         if (!collisiOn) {
@@ -101,10 +88,10 @@ public class Flecha extends Entity {
         if (!ativa) return;
 
         BufferedImage image = switch (directin) {
-            case "up" -> up1;
-            case "down" -> down1;
-            case "left" -> left1;
-            case "right" -> right1;
+            case "up" -> Spritesheet.flechaCima;
+            case "down" -> Spritesheet.flechaBaixo;
+            case "left" -> Spritesheet.flechaEsq;
+            case "right" -> Spritesheet.flechaDir;
             default -> null;
         };
 
@@ -112,6 +99,17 @@ public class Flecha extends Entity {
 
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
+
+        // 🎯 Desenha a imagem da flecha
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+
+        // 🟥⬜ Desenha a hitbox da flecha
+       // int hitboxX = screenX + solidArea.x;
+       // int hitboxY = screenY + solidArea.y;
+
+       // g2.setColor(new Color(255, 255, 255, 100));
+      //  g2.fillRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
+      //  g2.setColor(Color.RED);
+     //   g2.drawRect(hitboxX, hitboxY, solidArea.width, solidArea.height);
     }
 }

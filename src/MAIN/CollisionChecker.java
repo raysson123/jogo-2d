@@ -1,6 +1,9 @@
 package MAIN;
 
 import Entity.Entity;
+import object.SuperObject;
+import Entity.Inimigo;
+
 
 public class CollisionChecker {
     GamePanel gp;
@@ -60,105 +63,84 @@ public class CollisionChecker {
                 break;
         }
     }
-    public int checkObject(Entity entity, boolean player) {
-        int index = 999;
 
-        for (int i = 0; i < gp.obj.length; i++) {
-            if (gp.obj[i] != null) {
-                // Verifica se o objeto está dentro da área sólida da entidade
+    public int checkObject(Entity entity, boolean player) {
+        int index = -1;
+
+        for (int i = 0; i < gp.obj.size(); i++) {
+            SuperObject obj = gp.obj.get(i);
+            if (obj != null) {
+                // Ajusta áreas sólidas
                 entity.solidArea.x = entity.worldX + entity.solidArea.x;
                 entity.solidArea.y = entity.worldY + entity.solidArea.y;
-                gp.obj[i].solidArea.x = gp.obj[i].worldX + gp.obj[i].solidArea.x;
-                gp.obj[i].solidArea.y = gp.obj[i].worldY + gp.obj[i].solidArea.y;
+                obj.solidArea.x = obj.worldX + obj.solidArea.x;
+                obj.solidArea.y = obj.worldY + obj.solidArea.y;
 
-                switch (entity.directin){
+                switch (entity.directin) {
                     case "up":
                         entity.solidArea.y -= entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)){
-                            if( gp.obj[i].collision == true){
-                                entity.collisiOn = true;
-                            }
-                            if(player==true){
-                                index = i;
-                            }
-                        }
                         break;
                     case "down":
                         entity.solidArea.y += entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)){
-                            if( gp.obj[i].collision == true){
-                                entity.collisiOn = true;
-                            }
-                            if(player==true){
-                                index = i;
-                            }
-                        }
                         break;
                     case "left":
                         entity.solidArea.x -= entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)){
-                            if( gp.obj[i].collision == true){
-                                entity.collisiOn = true;
-                            }
-                            if(player==true){
-                                index = i;
-                            }
-                        }
                         break;
                     case "right":
                         entity.solidArea.x += entity.speed;
-                        if (entity.solidArea.intersects(gp.obj[i].solidArea)){
-                            if( gp.obj[i].collision == true){
-                                entity.collisiOn = true;
-                            } if(player==true){
-                                index = i;
-                            }
-                        }
                         break;
-
-
-
                 }
+
+                if (entity.solidArea.intersects(obj.solidArea)) {
+                    if (obj.collision) {
+                        entity.collisiOn = true;
+                    }
+                    if (player) {
+                        index = i;
+                    }
+                }
+
+                // Restaura áreas
                 entity.solidArea.x = entity.solidAreaDefaultX;
                 entity.solidArea.y = entity.solidAreaDefaultY;
-                gp.obj[i].solidArea.x = gp.obj[i].solidAreaDefaultX;
-                gp.obj[i].solidArea.y = gp.obj[i].solidAreaDefaultY;
-
-
+                obj.solidArea.x = obj.solidAreaDefaultX;
+                obj.solidArea.y = obj.solidAreaDefaultY;
             }
         }
         return index;
     }
 
     public int checkInimigo(Entity entity) {
-        for (int i = 0; i < gp.inimigos.length; i++) {
-            Entity inimigo = gp.inimigos[i];
-            if (inimigo != null) {
-                // Ajusta áreas sólidas
-                entity.solidArea.x = entity.worldX + entity.solidArea.x;
-                entity.solidArea.y = entity.worldY + entity.solidArea.y;
-                inimigo.solidArea.x = inimigo.worldX + inimigo.solidArea.x;
-                inimigo.solidArea.y = inimigo.worldY + inimigo.solidArea.y;
+        for (int i = 0; i < gp.inimigos.size(); i++) {
+            Entity inimigo = gp.inimigos.get(i);
+            if (inimigo == null) continue;
+            if (inimigo instanceof Inimigo) {
+                Inimigo inim = (Inimigo) inimigo;
+                if (!inim.ativo) continue;
+            }
+            // ✅ Ignora inimigos mortos
 
-                // Verifica colisão
-                if (entity.solidArea.intersects(inimigo.solidArea)) {
-                    // Restaura áreas
-                    entity.solidArea.x = entity.solidAreaDefaultX;
-                    entity.solidArea.y = entity.solidAreaDefaultY;
-                    inimigo.solidArea.x = inimigo.solidAreaDefaultX;
-                    inimigo.solidArea.y = inimigo.solidAreaDefaultY;
-                    return i; // índice do inimigo atingido
-                }
+            // Ajusta áreas sólidas
+            entity.solidArea.x = entity.worldX + entity.solidArea.x;
+            entity.solidArea.y = entity.worldY + entity.solidArea.y;
+            inimigo.solidArea.x = inimigo.worldX + inimigo.solidArea.x;
+            inimigo.solidArea.y = inimigo.worldY + inimigo.solidArea.y;
 
-                // Restaura áreas
+            if (entity.solidArea.intersects(inimigo.solidArea)) {
+                // Restaura
                 entity.solidArea.x = entity.solidAreaDefaultX;
                 entity.solidArea.y = entity.solidAreaDefaultY;
                 inimigo.solidArea.x = inimigo.solidAreaDefaultX;
                 inimigo.solidArea.y = inimigo.solidAreaDefaultY;
+                return i;
             }
+
+            // Restaura
+            entity.solidArea.x = entity.solidAreaDefaultX;
+            entity.solidArea.y = entity.solidAreaDefaultY;
+            inimigo.solidArea.x = inimigo.solidAreaDefaultX;
+            inimigo.solidArea.y = inimigo.solidAreaDefaultY;
         }
-        return -1; // nenhum inimigo atingido
+        return -1;
     }
-
-
 }
